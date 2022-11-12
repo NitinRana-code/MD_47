@@ -19,7 +19,8 @@ class handDetector():
         self.mpDraw = mp.solutions.drawing_utils
         self.tipIds = [4, 8, 12, 16, 20]
 
-    def findHands(self, img, draw=True):
+
+    def findHands(self, img, draw=True): 
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         # print(results.multi_hand_landmarks)
@@ -28,7 +29,9 @@ class handDetector():
             for handLms in self.results.multi_hand_landmarks:
                 if draw:
                     self.mpDraw.draw_landmarks(img, handLms,
-                                               self.mpHands.HAND_CONNECTIONS)
+                                            self.mpHands.HAND_CONNECTIONS,
+                                            self.mpDraw.DrawingSpec(color=(219,219,221), thickness=2, circle_radius=2),
+                                            self.mpDraw.DrawingSpec(color=(63,67,67), thickness=2, circle_radius=2))
 
         return img
 
@@ -47,8 +50,8 @@ class handDetector():
                 yList.append(cy)
                 # print(id, cx, cy)
                 self.lmList.append([id, cx, cy])
-                if draw:
-                    cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
+                # if draw:
+                #     cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
             xmin, xmax = min(xList), max(xList)
             ymin, ymax = min(yList), max(yList)
@@ -66,9 +69,14 @@ class handDetector():
         # Thumb
        
         if(len(self.lmList)):
-            
+            # print(self.lmList)
                 
-            if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]:
+            if self.lmList[self.tipIds[0]][1] > self.lmList[self.tipIds[0] - 1][1]+3: # +3 is used to just shift the value of 3 tipid by 3 points
+                # detecting separately because thumbs moves in x-axis where as other fingers move in y-axis
+                # negative value on right side means the threshold value from which it triggers whether finger is up or not
+                # 2nd index shows the axis --> 1 = x-axis, 2 = y-axis
+                # in case of thumb threshold value is 3
+                # in case of fingers threshold value is (tip value - 2)
                 fingers.append(1)
             else:
                 fingers.append(0)
@@ -84,8 +92,9 @@ class handDetector():
             fingers = [0,0,0,0,0]
 
         # totalFingers = fingers.count(1)
-
+        # print(fingers)
         return fingers
+
 
     def findDistance(self, p1, p2, img, draw=True,r=15, t=3):
         x1, y1 = self.lmList[p1][1:]
@@ -111,8 +120,9 @@ def main():
         success, img = cap.read()
         img = detector.findHands(img)
         lmList, bbox = detector.findPosition(img)
-        if len(lmList) != 0:
-            print(lmList[4])
+        detector.fingersUp()
+        # if len(lmList) != 0:
+        #     print(lmList[4])
 
         cTime = time.time()
         fps = 1 / (cTime - pTime)
@@ -124,6 +134,9 @@ def main():
         cv2.imshow("Image", img)
         cv2.waitKey(1)
 
+        if cv2.getWindowProperty("Image", cv2.WND_PROP_VISIBLE) < 1:
+            break
+        
 
 if __name__ == "__main__":
     main()
