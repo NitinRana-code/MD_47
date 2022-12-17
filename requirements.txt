@@ -1,0 +1,7 @@
+# project should be run at python==3.8 version
+autopy==4.0.0
+mediapipe==0.8.11
+numpy==1.23.4
+opencv_python==4.6.0.66
+PyAutoGUI==0.9.53
+PyQt5==5.15.7

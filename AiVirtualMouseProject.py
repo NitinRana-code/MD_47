@@ -103,7 +103,7 @@ class AiMouse():
                 #     15, (0, 255, 0), cv2.FILLED)
             
                     
-                ls = self.detector.lmList[4]
+                ls = self.detector.lmList[(self.clickFinger+1)*4]
                 cx = ls[1]
                 cy = ls[2]
                 cv2.circle(img, (cx, cy),
