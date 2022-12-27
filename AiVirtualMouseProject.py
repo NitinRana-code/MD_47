@@ -3,8 +3,6 @@ import numpy as np
 import HandTrackingModule as htm
 import autopy
 import time
-# import frontend as fe
-# from autopy.mouse import LEFT_BUTTON
 
 import pyautogui
 
